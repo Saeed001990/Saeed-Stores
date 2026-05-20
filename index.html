@@ -510,7 +510,7 @@
           <option>A</option>
           <option>B</option>
           <option>C</option>
-          <option>اD/option>
+          <option>D/option>
           <option>E</option>
         </select>
       </div>
@@ -555,8 +555,7 @@
         </label>
         <label class="radio-option" onclick="selectPayment(this)">
           <input type="radio" name="payment" value="تقسيط Tabby">
-          <span class="radio-label">الدفع بنظام التقسيط (Tabby)</span>
-          <span class="radio-badge badge-tabby">بدون فوائد</span>
+          <span class="radio-label">الدفع بنظام التقسيط </span>
         </label>
         <label class="radio-option" onclick="selectPayment(this)">
           <input type="radio" name="payment" value="تقسيط Tamara">
@@ -674,10 +673,10 @@ function getFormData() {
   return {
     name: document.getElementById('name').value.trim(),
     phone: document.getElementById('phone').value.trim(),
-    whatsapp: document.getElementById('whatsapp').checked ? 'نعم' : 'لا',
+    whatsapp: 'لا يوجد', 
     offer: document.getElementById('offer').value,
     branch: document.getElementById('branch').value,
-    nationality: document.getElementById('nationality').value,
+    nationality: 'لا يوجد', 
     discountCode: document.getElementById('discountCode').value.trim().toUpperCase() || 'لا يوجد',
     discountPercent: appliedDiscount ? `${appliedDiscount}%` : 'لا يوجد',
     finalPrice: `${currentPrice} ﷼`,
@@ -691,7 +690,6 @@ function validateForm(data) {
   if (!data.phone || data.phone.length < 9) return 'الرجاء إدخال رقم جوال صحيح';
   if (!data.offer) return 'الرجاء اختيار العرض';
   if (!data.branch) return 'الرجاء اختيار الفرع';
-  if (!data.nationality) return 'الرجاء اختيار الجنسية';
   if (!data.payment) return 'الرجاء اختيار طريقة الدفع';
   return null;
 }
