@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETQAN - احجز موعدك</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A227;
+    --gold-light: #F0D070;
+    --gold-dark: #9A7A1A;
+    --teal: #1A5F6E;
+    --teal-light: #2A8FA5;
+    --teal-dark: #0D3D47;
+    --bg: #0D2B35;
+    --bg2: #112F3A;
+    --card: rgba(255,255,255,0.06);
+    --card-border: rgba(201,162,39,0.25);
+    --white: #ffffff;
+    --text-muted: rgba(255,255,255,0.65);
+    --radius: 14px;
+    --input-bg: rgba(255,255,255,0.08);
+    --input-border: rgba(201,162,39,0.3);
+    --input-focus: rgba(201,162,39,0.7);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Cairo', 'Tajawal', sans-serif;
+    background: var(--bg);
+    color: var(--white);
+    min-height: 100vh;
+    direction: rtl;
+    overflow-x: hidden;
+  }
+
+  /* Background decorative circles */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(26,95,110,0.35) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -150px; left: -150px;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,162,39,0.15) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page-wrap {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 60px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 36px;
+    animation: fadeDown 0.6s ease;
+  }
+  .logo-ring {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 36px;
+    box-shadow: 0 0 30px rgba(201,162,39,0.4);
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.3;
+  }
+  .header p {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-top: 6px;
+  }
+
+  /* Discount banner */
+  .discount-banner {
+    background: linear-gradient(135deg, rgba(201,162,39,0.18), rgba(201,162,39,0.08));
+    border: 1px solid rgba(201,162,39,0.4);
+    border-radius: 12px;
+    padding: 14px 20px;
+    text-align: center;
+    margin-bottom: 28px;
+    max-width: 520px;
+    width: 100%;
+    animation: fadeDown 0.7s ease;
+  }
+  .discount-banner .emoji { font-size: 20px; margin-left: 6px; }
+  .discount-banner span {
+    font-size: 14px;
+    color: var(--gold-light);
+    font-weight: 600;
+    line-height: 1.6;
+  }
+  .discount-banner .code-pill {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--teal-dark);
+    font-weight: 800;
+    padding: 2px 12px;
+    border-radius: 20px;
+    font-size: 15px;
+    margin: 0 4px;
+  }
+
+  /* Card */
+  .form-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 32px 28px;
+    max-width: 520px;
+    width: 100%;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    animation: fadeUp 0.7s ease;
+  }
+
+  /* Field group */
+  .field-group { margin-bottom: 20px; }
+  .field-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gold-light);
+    margin-bottom: 8px;
+  }
+  .field-group label span.req { color: #ff6b6b; margin-right: 3px; }
+
+  input[type="text"],
+  input[type="tel"],
+  input[type="email"],
+  select,
+  textarea {
+    width: 100%;
+    background: var(--input-bg);
+    border: 1.5px solid var(--input-border);
+    border-radius: var(--radius);
+    padding: 13px 16px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+    color: var(--white);
+    direction: rtl;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.3); }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--input-focus);
+    box-shadow: 0 0 0 3px rgba(201,162,39,0.12);
+  }
+  select option { background: #1a3a45; color: white; }
+
+  /* Toggle row */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .toggle-label { font-size: 14px; color: var(--text-muted); font-weight: 500; }
+  .toggle {
+    position: relative;
+    width: 44px; height: 24px;
+    flex-shrink: 0;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: rgba(255,255,255,0.15);
+    border-radius: 24px;
+    transition: 0.3s;
+  }
+  .toggle-slider:before {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+    right: 3px; top: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: 0.3s;
+  }
+  .toggle input:checked + .toggle-slider { background: var(--gold); }
+  .toggle input:checked + .toggle-slider:before { transform: translateX(-20px); }
+
+  /* Discount row */
+  .discount-row {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+  }
+  .discount-row input { flex: 1; }
+  .btn-apply {
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    color: var(--teal-dark);
+    border: none;
+    border-radius: var(--radius);
+    padding: 0 22px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .btn-apply:hover { opacity: 0.9; }
+  .btn-apply:active { transform: scale(0.97); }
+
+  /* Price summary */
+  .price-box {
+    background: rgba(201,162,39,0.08);
+    border: 1px solid rgba(201,162,39,0.2);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 22px;
+  }
+  .price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: var(--text-muted);
+  }
+  .price-final {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--gold-light);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .price-final .currency { font-size: 14px; color: var(--gold); }
+
+  /* Payment options */
+  .payment-title {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .payment-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .radio-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1.5px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .radio-option:hover { border-color: var(--gold); background: rgba(201,162,39,0.05); }
+  .radio-option input[type="radio"] {
+    width: 18px; height: 18px;
+    accent-color: var(--gold);
+    cursor: pointer;
+  }
+  .radio-option.selected {
+    border-color: var(--gold);
+    background: rgba(201,162,39,0.1);
+  }
+  .radio-label { font-size: 14px; font-weight: 600; }
+  .radio-badge {
+    margin-right: auto;
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+  .badge-tabby { background: rgba(26,95,110,0.5); color: #5ee8ff; border: 1px solid rgba(94,232,255,0.3); }
+  .badge-tamara { background: rgba(100,200,100,0.15); color: #7dde7d; border: 1px solid rgba(125,222,125,0.3); }
+
+  /* Submit button */
+  .btn-submit {
+    width: 100%;
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    color: var(--teal-dark);
+    border: none;
+    border-radius: var(--radius);
+    padding: 16px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
+    box-shadow: 0 4px 20px rgba(201,162,39,0.35);
+    letter-spacing: 0.3px;
+  }
+  .btn-submit:hover {
+    opacity: 0.92;
+    box-shadow: 0 6px 28px rgba(201,162,39,0.5);
+  }
+  .btn-submit:active { transform: scale(0.99); }
+  .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  /* Privacy */
+  .privacy-note {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 14px;
+  }
+  .privacy-note a { color: var(--gold); text-decoration: none; }
+  .privacy-note a:hover { text-decoration: underline; }
+
+  /* Payment logos */
+  .payment-logos {
+    max-width: 520px;
+    width: 100%;
+    margin-top: 24px;
+    animation: fadeUp 0.9s ease;
+  }
+  .logos-label {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+  .logos-strip {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .logo-pill {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: #1a3a45;
+    border: 1px solid var(--gold);
+    border-radius: 12px;
+    padding: 14px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gold-light);
+    z-index: 999;
+    transition: transform 0.4s ease;
+    white-space: nowrap;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    text-align: center;
+    max-width: 90vw;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.error { border-color: #ff6b6b; color: #ff9999; background: #3a1a1a; }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .spinner {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid rgba(0,0,0,0.2);
+    border-top-color: var(--teal-dark);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-left: 8px;
+  }
+
+  /* Divider */
+  .divider {
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    margin: 20px 0;
+  }
+
+  /* Success overlay */
+  .success-state {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+  }
+  .success-icon {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 40px rgba(201,162,39,0.5);
+  }
+  .success-state h2 {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--gold-light);
+    margin-bottom: 10px;
+  }
+  .success-state p {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  @media (max-width: 480px) {
+    .form-card { padding: 24px 18px; }
+    .header h1 { font-size: 22px; }
+    .discount-banner { padding: 12px 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <div class="header">
+    <div class="logo-ring">🦷</div>
+    <h1>MOHAMED SAEED STORES</h1>
+    <p>احجز موعدك الآن </p>
+  </div>
+
+  
+
+  <div class="form-card" id="formCard">
+    <div id="formContent">
+      <!-- Name -->
+      <div class="field-group">
+        <label>الإسم: <span class="req">*</span></label>
+        <input type="text" id="name" placeholder="أدخل اسمك الكامل" required>
+      </div>
+
+      <!-- Phone -->
+      <div class="field-group">
+        <label>رقم الهاتف: <span class="req">*</span></label>
+        <input type="tel" id="phone" placeholder="+966XXXXXXXXX" required>
+      </div>
+
+    #  <!-- WhatsApp toggle -->
+     # <div class="toggle-row">
+       # <label class="toggle">
+        #  <input type="checkbox" id="whatsapp">
+        #  <span class="toggle-slider"></span>
+       # </label>
+       # <span class="toggle-label">إرسال كوبونات واتساب</span>
+     # </div>
+
+      <!-- Offer -->
+      <div class="field-group">
+        <label>العرض: <span class="req">*</span></label>
+        <select id="offer" required>
+          <option value="">-- اختر العرض --</option>
+          <option>العرض الاول </option>
+          <option>العرض التاني </option>
+          <option>العرض التالت</option>
+          <option>العرض الرابع</option>
+          <option>أخرى</option>
+        </select>
+      </div>
+
+      <!-- Branch -->
+      <div class="field-group">
+        <label>فرع: <span class="req">*</span></label>
+        <select id="branch" required>
+          <option value="">-- اختر الفرع --</option>
+          <option>A</option>
+          <option>B</option>
+          <option>C</option>
+          <option>اD/option>
+          <option>E</option>
+        </select>
+      </div>
+
+
+
+      <!-- Discount code -->
+      <div class="field-group">
+        <label>كود الخصم:</label>
+        <div class="discount-row">
+          <input type="text" id="discountCode" placeholder="أدخل كود الخصم" style="direction:ltr; text-align:right;">
+          <button class="btn-apply" type="button" onclick="applyDiscount()">تطبيق</button>
+        </div>
+        <div id="discountMsg" style="font-size:12px; margin-top:6px; display:none;"></div>
+      </div>
+
+      <hr class="divider">
+
+      <!-- Price box -->
+      <div class="price-box">
+        <div class="price-row">
+          <span>السعر الأصلي</span>
+          <span id="originalPrice">3922 EGP</span>
+        </div>
+        <div class="price-row" id="discountRow" style="display:none; color:#7dde7d;">
+          <span>خصم الكوبون</span>
+          <span id="discountAmt"></span>
+        </div>
+        <hr class="divider" style="margin: 10px 0;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:13px; color:var(--text-muted);">السعر النهائي</span>
+          <span class="price-final"><span class="currency">﷼</span><span id="finalPrice">3922</span></span>
+        </div>
+      </div>
+
+      <!-- Payment -->
+      <div class="payment-title">من فضلك قم بإختيار طريقة الدفع:</div>
+      <div class="payment-options" id="paymentOptions">
+        <label class="radio-option" onclick="selectPayment(this)">
+          <input type="radio" name="payment" value="دفعة واحدة">
+          <span class="radio-label">الدفع دفعه واحده</span>
+        </label>
+        <label class="radio-option" onclick="selectPayment(this)">
+          <input type="radio" name="payment" value="تقسيط Tabby">
+          <span class="radio-label">الدفع بنظام التقسيط (Tabby)</span>
+          <span class="radio-badge badge-tabby">بدون فوائد</span>
+        </label>
+        <label class="radio-option" onclick="selectPayment(this)">
+          <input type="radio" name="payment" value="تقسيط Tamara">
+          <span class="radio-label">الدفع بنظام التقسيط (Tamara)</span>
+          <span class="radio-badge badge-tamara">بدون فوائد</span>
+        </label>
+      </div>
+
+      <!-- Submit -->
+      <button class="btn-submit" id="submitBtn" onclick="submitForm()">
+        احجز الآن 🗓️
+      </button>
+
+      <div class="privacy-note">
+        تطبيق <a href="#" onclick="return false;">سياسة الخصوصية</a>
+      </div>
+    </div>
+
+    <!-- Success state -->
+    <div class="success-state" id="successState">
+      <div class="success-icon">✅</div>
+      <h2>تم الحجز بنجاح!</h2>
+      <p>شكراً لك، تم استلام طلبك وسيتواصل معك فريقنا قريباً.<br>سيصلك تأكيد على رقم جوالك.</p>
+      <button class="btn-submit" style="margin-top:24px; max-width:200px;" onclick="resetForm()">حجز جديد</button>
+    </div>
+  </div>
+
+  <div class="payment-logos">
+    <div class="logos-label">0% فوائد مع تابي وتمارا وبسيطة</div>
+    <div class="logos-strip">
+      <span class="logo-pill">bassata</span>
+      <span class="logo-pill">tabby</span>
+      <span class="logo-pill">tamara</span>
+      <span class="logo-pill">Visa</span>
+      <span class="logo-pill">Mastercard</span>
+      <span class="logo-pill">مدى</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// ⚙️ CONFIGURATION — Edit these values
+// ============================================================
+const CONFIG = {
+  // 1. Your Google Apps Script Web App URL (see setup guide below)
+  SHEET_URL: "https://script.google.com/macros/s/AKfycbwSh-mZFKJQcPAx6v1gif1_uGuvCJ_c5aZF8_O9u__IQQYBEAzBOewsZkaTT51FkHl1Pw/exec",
+
+  // 2. The email that receives booking notifications (set in Google Apps Script)
+  NOTIFY_EMAIL: "Mohamedelsaeed001@gmail.com@gmail.com",
+
+  // 3. Original price
+  BASE_PRICE: 3922,
+
+  // 4. Discount codes: { "CODE": discountPercent }
+  DISCOUNT_CODES: {
+    "S15": 15,
+    "SAVE10": 10,
+    "VIP20": 20
+  }
+};
+// ============================================================
+
+let appliedDiscount = 0;
+let currentPrice = CONFIG.BASE_PRICE;
+
+function applyDiscount() {
+  const code = document.getElementById('discountCode').value.trim().toUpperCase();
+  const msgEl = document.getElementById('discountMsg');
+  const discountRow = document.getElementById('discountRow');
+
+  if (!code) {
+    showMsg(msgEl, 'أدخل كود الخصم أولاً', 'error');
+    return;
+  }
+
+  if (CONFIG.DISCOUNT_CODES[code] !== undefined) {
+    const pct = CONFIG.DISCOUNT_CODES[code];
+    appliedDiscount = pct;
+    const saved = Math.round(CONFIG.BASE_PRICE * pct / 100);
+    currentPrice = CONFIG.BASE_PRICE - saved;
+
+    document.getElementById('finalPrice').textContent = currentPrice.toLocaleString('ar');
+    document.getElementById('discountAmt').textContent = `- ${saved.toLocaleString('ar')} ﷼`;
+    discountRow.style.display = 'flex';
+
+    showMsg(msgEl, `✅ تم تطبيق خصم ${pct}%! وفّرت ${saved} ﷼`, 'success');
+  } else {
+    appliedDiscount = 0;
+    currentPrice = CONFIG.BASE_PRICE;
+    document.getElementById('finalPrice').textContent = CONFIG.BASE_PRICE.toLocaleString('ar');
+    discountRow.style.display = 'none';
+    showMsg(msgEl, '❌ كود الخصم غير صحيح', 'error');
+  }
+}
+
+function showMsg(el, text, type) {
+  el.style.display = 'block';
+  el.style.color = type === 'success' ? '#7dde7d' : '#ff9999';
+  el.textContent = text;
+}
+
+function selectPayment(el) {
+  document.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  el.querySelector('input').checked = true;
+}
+
+function getFormData() {
+  const paymentInput = document.querySelector('input[name="payment"]:checked');
+  return {
+    name: document.getElementById('name').value.trim(),
+    phone: document.getElementById('phone').value.trim(),
+    whatsapp: document.getElementById('whatsapp').checked ? 'نعم' : 'لا',
+    offer: document.getElementById('offer').value,
+    branch: document.getElementById('branch').value,
+    nationality: document.getElementById('nationality').value,
+    discountCode: document.getElementById('discountCode').value.trim().toUpperCase() || 'لا يوجد',
+    discountPercent: appliedDiscount ? `${appliedDiscount}%` : 'لا يوجد',
+    finalPrice: `${currentPrice} ﷼`,
+    payment: paymentInput ? paymentInput.value : '',
+    timestamp: new Date().toLocaleString('ar-SA')
+  };
+}
+
+function validateForm(data) {
+  if (!data.name) return 'الرجاء إدخال الاسم';
+  if (!data.phone || data.phone.length < 9) return 'الرجاء إدخال رقم جوال صحيح';
+  if (!data.offer) return 'الرجاء اختيار العرض';
+  if (!data.branch) return 'الرجاء اختيار الفرع';
+  if (!data.nationality) return 'الرجاء اختيار الجنسية';
+  if (!data.payment) return 'الرجاء اختيار طريقة الدفع';
+  return null;
+}
+
+async function submitForm() {
+  const data = getFormData();
+  const error = validateForm(data);
+
+  if (error) {
+    showToast(error, true);
+    return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = 'جاري الإرسال... <span class="spinner"></span>';
+
+  try {
+    // Check if URL is configured
+    if (CONFIG.SHEET_URL === "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE") {
+      // Demo mode — simulate success
+      await new Promise(r => setTimeout(r, 1500));
+      showSuccess();
+      return;
+    }
+
+    const response = await fetch(CONFIG.SHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...data, notifyEmail: CONFIG.NOTIFY_EMAIL })
+    });
+
+    showSuccess();
+  } catch (err) {
+    console.error(err);
+    showToast('حدث خطأ، يرجى المحاولة مرة أخرى', true);
+    btn.disabled = false;
+    btn.innerHTML = 'احجز الآن 🗓️';
+  }
+}
+
+function showSuccess() {
+  document.getElementById('formContent').style.display = 'none';
+  document.getElementById('successState').style.display = 'flex';
+}
+
+function resetForm() {
+  document.getElementById('formContent').style.display = 'block';
+  document.getElementById('successState').style.display = 'none';
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('submitBtn').innerHTML = 'احجز الآن 🗓️';
+  document.querySelectorAll('input[type="text"], input[type="tel"], select').forEach(el => {
+    el.value = '';
+  });
+  document.getElementById('whatsapp').checked = false;
+  document.getElementById('discountCode').value = '';
+  document.getElementById('discountMsg').style.display = 'none';
+  document.getElementById('discountRow').style.display = 'none';
+  document.getElementById('finalPrice').textContent = CONFIG.BASE_PRICE.toLocaleString('ar');
+  appliedDiscount = 0;
+  currentPrice = CONFIG.BASE_PRICE;
+  document.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
+}
+
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '') + ' show';
+  setTimeout(() => { t.className = 'toast' + (isError ? ' error' : ''); }, 3500);
+}
+</script>
+
+<!--
+══════════════════════════════════════════════════════════════
+📋 GOOGLE SHEETS + EMAIL SETUP GUIDE
+══════════════════════════════════════════════════════════════
+
+STEP 1: Create a Google Sheet
+  1. Go to sheets.google.com
+  2. Create a new sheet called "Bookings"
+  3. In Row 1, add these headers:
+     A1: Timestamp   B1: Name   C1: Phone   D1: WhatsApp
+     E1: Offer       F1: Branch G1: Nationality  H1: Discount Code
+     I1: Discount %  J1: Final Price  K1: Payment Method
+
+STEP 2: Create Google Apps Script
+  1. In the Sheet, go to Extensions → Apps Script
+  2. Delete any existing code and paste this:
+
+─────────────────────────────────────────────
+function doPost(e) {
+  const sheet = SpreadsheetApp.getActiveSheet();
+  const data = JSON.parse(e.postData.contents);
+
+  sheet.appendRow([
+    data.timestamp,
+    data.name,
+    data.phone,
+    data.whatsapp,
+    data.offer,
+    data.branch,
+    data.nationality,
+    data.discountCode,
+    data.discountPercent,
+    data.finalPrice,
+    data.payment
+  ]);
+
+  // Send email notification
+  const emailBody = `
+📅 حجز جديد - ابتسامة النجوم
+━━━━━━━━━━━━━━━━━━━
+الاسم: ${data.name}
+الجوال: ${data.phone}
+واتساب: ${data.whatsapp}
+العرض: ${data.offer}
+الفرع: ${data.branch}
+الجنسية: ${data.nationality}
+كود الخصم: ${data.discountCode}
+نسبة الخصم: ${data.discountPercent}
+السعر النهائي: ${data.finalPrice}
+طريقة الدفع: ${data.payment}
+التاريخ: ${data.timestamp}
+  `;
+
+  MailApp.sendEmail({
+    to: data.notifyEmail,
+    subject: "📅 حجز جديد: " + data.name + " - " + data.offer.substring(0, 30),
+    body: emailBody
+  });
+
+  return ContentService.createTextOutput(
+    JSON.stringify({ status: "success" })
+  ).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doGet(e) {
+  return ContentService.createTextOutput("OK");
+}
+─────────────────────────────────────────────
+
+STEP 3: Deploy as Web App
+  1. Click "Deploy" → "New Deployment"
+  2. Type: "Web App"
+  3. Execute as: "Me"
+  4. Who has access: "Anyone"
+  5. Click "Deploy" → Copy the Web App URL
+
+STEP 4: Update this HTML file
+  1. Find CONFIG at the top of the <script> section
+  2. Replace "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE" with your URL
+  3. Replace "YOUR_EMAIL@gmail.com" with your email
+
+Done! Every booking will be saved to your sheet AND emailed to you.
+══════════════════════════════════════════════════════════════
+-->
+</body>
+</html>
