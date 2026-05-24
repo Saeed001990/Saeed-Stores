@@ -188,7 +188,7 @@
           <option value="العرض التاني" id="opt2" data-price="0">جاري جلب السعر...</option>
           <option value="العرض التالت" id="opt3" data-price="0">جاري جلب السعر...</option>
           <option value="العرض الرابع" id="opt4" data-price="0">جاري جلب السعر...</option>
-          <option value="أخرى" id="opt5" data-price="0">جاري جلب السعر...</option>
+          <option value="العرض الخامس" id="opt5" data-price="0">جاري جلب السعر...</option>
         </select>
       </div>
 
@@ -278,7 +278,7 @@
 
 <script>
 const CONFIG = {
-  SHEET_URL: "https://script.google.com/macros/s/AKfycbyS78TzPplXMAS8aarlarU77d0WmpNmUoOw0-1_3T0zHuL9pXac1P67UPigz_RUSxLbNw/exec",
+  SHEET_URL: "https://script.google.com/macros/s/AKfycbxc07AVPlRyiACn79y4sx19wzkaJE2DpgT6D4qjAsZZoEG8H50Fak8AFB_hMrIS6140/exec",
   NOTIFY_EMAIL: "Mohamedelsaeed001@gmail.com"
 };
 
@@ -287,24 +287,24 @@ let basePrice = 0, appliedDiscount = 0, currentPrice = 0, selectedPaymentType = 
 
 async function fetchLiveSettings() {
   try {
-    // 1. إضافة الـ Cache Buster لمنع الكاش تماماً ونقل الطلب كـ GET نقي
     const timestamp = new Date().getTime();
+    // 💡 التعديل الجوهري: إضافة وضع cors وتتبع الـ redirect تلقائياً
     const response = await fetch(`${CONFIG.SHEET_URL}?nocache=${timestamp}`, {
       method: 'GET',
+      mode: 'cors',
+      redirect: 'follow',
       headers: {
         'Accept': 'application/json'
       }
     });
     
     liveSettings = await response.json();
-    console.log("البيانات وصلت بنجاح:", liveSettings); // هتظهرلك في الـ Console لما تشتغل
+    console.log("البيانات وصلت بنجاح:", liveSettings);
     
-    // 2. تطبيق الخلفية لو موجودة
     if (liveSettings.prices && liveSettings.prices.BACKGROUND_URL) {
       document.body.style.backgroundImage = `url('${liveSettings.prices.BACKGROUND_URL}')`;
     }
     
-    // 3. حقن الأسعار ديناميكياً (بناءً على التعديل الأول OFFER_1, OFFER_2...)
     if (liveSettings.prices) {
       const opt1 = document.getElementById('opt1');
       if (opt1) {
@@ -337,7 +337,6 @@ async function fetchLiveSettings() {
       }
     }
 
-    // 4. إخفاء شاشة التحميل
     const loader = document.getElementById('pageLoader');
     if (loader) {
       loader.style.opacity = '0';
@@ -346,7 +345,24 @@ async function fetchLiveSettings() {
 
   } catch (error) {
     console.error("خطأ أثناء جلب البيانات الحية:", error);
-    showToast("فشل في جلب الأسعار الحية من جوجل شيت", true);
+    showToast("فشل في جلب الأسعار الحية، يرجى إعادة تحميل الصفحة", true);
+
+    // Fallback: show static labels so options aren't stuck
+    const fallbackOffers = [
+      { id: 'opt1', label: 'العرض الأول' },
+      { id: 'opt2', label: 'العرض الثاني' },
+      { id: 'opt3', label: 'العرض الثالث' },
+      { id: 'opt4', label: 'العرض الرابع' },
+      { id: 'opt5', label: 'العرض الخامس' },
+    ];
+    fallbackOffers.forEach(({ id, label }) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.setAttribute('data-price', 0);
+        el.textContent = label + ' (السعر غير متاح مؤقتاً)';
+      }
+    });
+
     const loader = document.getElementById('pageLoader');
     if (loader) loader.style.display = 'none';
   }
